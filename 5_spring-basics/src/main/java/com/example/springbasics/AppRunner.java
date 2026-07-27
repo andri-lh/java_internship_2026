@@ -8,7 +8,7 @@ public class AppRunner implements CommandLineRunner {
 
 
     public AppRunner(NotificationManager notificationManager) {
-        notificationManager.notifyUser("Hello Spring");
+        notificationManager.notifyUser("Welcome to Spring!");
     }
 
     @Override
