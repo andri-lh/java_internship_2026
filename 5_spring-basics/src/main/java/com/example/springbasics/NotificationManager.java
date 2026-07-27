@@ -14,7 +14,7 @@ public class NotificationManager {
     }
 
     public void notifyUser(String message) {
-        System.out.println("Sending EMAIL notification: " + message);
+        notificationService.send("Sending EMAIL notification: " + message);
     }
 
 }

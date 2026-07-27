@@ -10,7 +10,11 @@ public class EmailNotificationService implements NotificationService
 {
 
     @Value("${notification.prefix}")
+    private String prefix;
+
+
     public void send(String message) {
-        System.out.println(message);
+        System.out.println(prefix + " " + message);
     }
+
 }
