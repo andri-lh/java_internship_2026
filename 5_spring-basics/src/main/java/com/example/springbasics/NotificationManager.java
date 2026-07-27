@@ -1,0 +1,20 @@
+package com.example.springbasics;
+
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
+
+@Component
+public class NotificationManager {
+
+    private final NotificationService notificationService;
+
+
+    public NotificationManager(@Qualifier("emailNotificationService") NotificationService notificationService) {
+        this.notificationService = notificationService;
+    }
+
+    public void notifyUser(String message) {
+        System.out.println("Sending EMAIL notification: " + message);
+    }
+
+}
