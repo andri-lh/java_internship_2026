@@ -9,7 +9,7 @@ public class NotificationManager {
     private final NotificationService notificationService;
 
 
-    public NotificationManager(@Qualifier("emailNotificationService") NotificationService notificationService) {
+    public NotificationManager(@Qualifier("smsNotificationService") NotificationService notificationService) {
         this.notificationService = notificationService;
     }
 
