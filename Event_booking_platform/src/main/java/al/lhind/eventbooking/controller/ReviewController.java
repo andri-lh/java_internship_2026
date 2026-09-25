@@ -1,0 +1,42 @@
+package al.lhind.eventbooking.controller;
+
+import al.lhind.eventbooking.dto.request.ReviewCreateRequest;
+import al.lhind.eventbooking.dto.response.ReviewResponse;
+import al.lhind.eventbooking.service.ReviewService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/api/v1/events/{eventId}/reviews")
+public class ReviewController {
+
+    private final ReviewService reviewService;
+
+    public ReviewController(ReviewService reviewService) {
+        this.reviewService = reviewService;
+    }
+
+    @PostMapping
+    public ResponseEntity<ReviewResponse> createReview(
+            @PathVariable Long eventId,
+            @Valid @RequestBody ReviewCreateRequest request,
+            Authentication authentication) {
+
+        ReviewResponse response = reviewService.createReview(
+                authentication.getName(),
+                eventId,
+                request
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(response);
+    }
+}
