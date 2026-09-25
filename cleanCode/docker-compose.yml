@@ -1,0 +1,7 @@
+services:
+  activemq:
+    image: apache/activemq-classic:latest
+    container_name: activemq-classic-clean-code
+    ports:
+      - "61616:61616"
+      - "8161:8161"
