@@ -1,20 +1,39 @@
 # Event Booking Platform
 
-Single-module Spring Boot backend for the internship EventBooking assignment. The application is being implemented requirement by requirement.
+Monorepo for the Event Booking Platform internship project.
+
+## Repository layout
+
+- `backend/` — single-module Spring Boot REST API, MySQL persistence, and backend tests.
+- `frontend/` — React and TypeScript web client with a home page and public event browser.
+- `compose.yaml` — starts the backend API and MySQL together.
+- `.env.example` — local Docker Compose configuration template.
 
 ## Requirements
 
 - Java 21
-- Maven 3.9+ (or use the Maven wrapper when one is added)
+- Maven 3.9+
 - Docker Desktop with Docker Compose
 
 ## Local setup
 
 1. Copy `.env.example` to `.env` and replace the local placeholder secrets.
-2. Start the API and MySQL with `docker compose up --build`.
+2. From the repository root, run:
+
+```powershell
+docker compose up --build
+```
+
 3. Stop with `docker compose down`. Add `-v` only when you intentionally want to delete the local database volume.
 
-The API listens on port 8080. OpenAPI UI is available at `/swagger-ui.html`.
+The API listens on port 8080.
+
+## API documentation
+
+- Swagger UI: `http://localhost:8080/swagger-ui.html`
+- OpenAPI JSON: `http://localhost:8080/api-docs`
+
+Public endpoints can be tried directly. For protected endpoints, register or log in, copy the `accessToken` from the login response, select **Authorize** in Swagger UI, and paste the token without the `Bearer ` prefix. The UI adds that prefix automatically. Access is still restricted by the account's role.
 
 ## Profiles
 
@@ -29,26 +48,17 @@ Never commit `.env` or real credentials. In the `dev` profile, Hibernate `ddl-au
 Run the fast Mockito unit tests without Docker:
 
 ```powershell
-mvn '-Dtest=BookingServiceUnitTest,ReviewServiceUnitTest' test
+mvn -f backend/pom.xml '-Dtest=BookingServiceUnitTest,ReviewServiceUnitTest' test
 ```
 
 Run the complete suite with Docker Desktop running:
 
 ```powershell
-mvn clean test
+mvn -f backend/pom.xml clean test
 ```
 
-The integration tests share one temporary MySQL container per Maven run. They clear test data before each case; no manually created database or Compose stack is needed for the tests. The `clean` goal removes stale files from `target/` before running.
+The integration tests share one temporary MySQL container per Maven run. They clear test data before each case; no manually created database or Compose stack is needed for the tests. The `clean` goal removes stale files from `backend/target/` before running.
 
-## Initial structure
+## Frontend development
 
-- `config`: OpenAPI and application configuration
-- `controller`: REST resource boundaries
-- `dto`: request and response shapes
-- `entity`: JPA domain model and enums
-- `exception`: API error handling boundary
-- `mapper`: DTO/entity mapping boundary
-- `repository`: Spring Data persistence interfaces
-- `security`: JWT and authorization boundaries
-- `service`: application service interfaces and implementation classes
-- `src/test`: integration and unit test locations
+In a second terminal, run `npm install` and `npm run dev` from `frontend/`. The Vite development server proxies `/api` requests to the backend on port 8080. See `frontend/README.md` for details.

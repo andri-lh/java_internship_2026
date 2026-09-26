@@ -6,8 +6,6 @@ services:
       MYSQL_USER: ${MYSQL_USER:-event_booking_user}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-change_me_local}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-change_me_root}
-    ports:
-      - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
@@ -17,20 +15,30 @@ services:
       retries: 15
       start_period: 20s
 
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "8025:8025"
+
   api:
-    build: .
+    build: ./backend
     environment:
       SPRING_PROFILES_ACTIVE: dev
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE:-event_booking_db}?useSSL=false&serverTimezone=UTC
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE:-event_booking_db}?sslMode=REQUIRED&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: ${MYSQL_USER:-event_booking_user}
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD:-change_me_local}
       JWT_SECRET: ${JWT_SECRET:-replace_with_a_base64_encoded_secret_of_at_least_32_bytes}
       JWT_EXPIRATION: ${JWT_EXPIRATION:-3600000}
+      MAIL_HOST: mailpit
+      MAIL_PORT: 1025
+      APP_FRONTEND_BASE_URL: ${APP_FRONTEND_BASE_URL:-http://localhost:5173}
     ports:
       - "8080:8080"
     depends_on:
       mysql:
         condition: service_healthy
+      mailpit:
+        condition: service_started
 
 volumes:
   mysql_data:

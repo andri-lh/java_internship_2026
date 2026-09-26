@@ -4,3 +4,9 @@ target/
 *.iml
 .env
 *.log
+
+# Frontend build and dependency output
+node_modules/
+dist/
+.next/
+.vite/
