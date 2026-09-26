@@ -1,0 +1,8 @@
+# SITE_ADDRESS examples:
+#   :80                        plain HTTP (testing)
+#   203-0-113-10.sslip.io      automatic HTTPS (Let's Encrypt) for that IP, no domain needed
+#   demo.example.com           automatic HTTPS for your own domain
+{$SITE_ADDRESS::80} {
+	encode gzip
+	reverse_proxy web:80
+}

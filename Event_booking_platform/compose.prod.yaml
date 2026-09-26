@@ -1,0 +1,86 @@
+# Production stack for a single Linux host (e.g. an AWS EC2 instance).
+#   cp .env.prod.example .env.prod   # then edit the values
+#   docker compose -f compose.prod.yaml --env-file .env.prod up -d --build
+# Only Caddy (ports 80/443) is exposed. MySQL and the API stay on the private Docker network.
+services:
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-event_booking_db}
+      MYSQL_USER: ${MYSQL_USER:-event_booking_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?set MYSQL_PASSWORD in .env.prod}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?set MYSQL_ROOT_PASSWORD in .env.prod}
+    # Small buffer pool so MySQL fits next to the JVM on a 1-2 GB instance.
+    command: ["--innodb-buffer-pool-size=128M", "--performance-schema=OFF", "--max-connections=60"]
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p$${MYSQL_ROOT_PASSWORD} --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+
+  api:
+    build: ./backend
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE:-event_booking_db}?sslMode=PREFERRED&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER:-event_booking_user}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env.prod}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-3600000}
+      APP_FRONTEND_BASE_URL: ${APP_FRONTEND_BASE_URL:?set APP_FRONTEND_BASE_URL in .env.prod}
+      CORS_ALLOWED_ORIGINS: ${APP_FRONTEND_BASE_URL}
+      EMAIL_VERIFICATION_REQUIRED: ${EMAIL_VERIFICATION_REQUIRED:-false}
+      MAIL_HOST: ${MAIL_HOST:-}
+      MAIL_PORT: ${MAIL_PORT:-587}
+      MAIL_USERNAME: ${MAIL_USERNAME:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+      MAIL_FROM: ${MAIL_FROM:-no-reply@eventbooking.local}
+      BOOTSTRAP_ADMIN_USERNAME: ${BOOTSTRAP_ADMIN_USERNAME:-}
+      BOOTSTRAP_ADMIN_EMAIL: ${BOOTSTRAP_ADMIN_EMAIL:-}
+      BOOTSTRAP_ADMIN_PASSWORD: ${BOOTSTRAP_ADMIN_PASSWORD:-}
+      DEMO_DATA_ENABLED: ${DEMO_DATA_ENABLED:-false}
+      DEMO_DATA_PASSWORD: ${DEMO_DATA_PASSWORD:-}
+      # Keep the JVM inside a small instance's memory.
+      JAVA_TOOL_OPTIONS: -Xms128m -Xmx${API_HEAP_MB:-384}m
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health >/dev/null 2>&1 || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 20
+      start_period: 60s
+
+  web:
+    build: ./frontend
+    restart: unless-stopped
+    depends_on:
+      - api
+    environment:
+      API_UPSTREAM: http://api:8080
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    depends_on:
+      - web
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:-:80}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  mysql_data:
+  caddy_data:
+  caddy_config:
