@@ -15,12 +15,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface EventRepository extends JpaRepository<Event, Long> {
-    List<Event> findByStatus(EventStatus status);
-
     List<Event> findByOrganizerId(Long organizerId);
-
-    @Query("select e from Event e where e.status = :status and e.venue.city = :city")
-    List<Event> findByStatusAndCity(@Param("status") EventStatus status, @Param("city") String city);
 
     @Query(value = "select * from events where id = :eventId for update", nativeQuery = true)
     Optional<Event> findByIdForUpdate(@Param("eventId") Long eventId);
