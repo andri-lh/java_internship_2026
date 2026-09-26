@@ -38,7 +38,7 @@ class RegistrationApiIntegrationTest extends MySqlIntegrationTest {
         String suffix = UUID.randomUUID().toString();
         String username = "attendee-" + suffix;
         String email = "attendee-" + suffix + "@example.test";
-        String rawPassword = "safe-password-123";
+        String rawPassword = "Safe-password-123";
 
         mockMvc.perform(post("/api/v1/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)

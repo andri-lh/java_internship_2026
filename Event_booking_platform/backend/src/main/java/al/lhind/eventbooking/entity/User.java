@@ -44,6 +44,9 @@ public class User {
     @Column(nullable = false)
     private boolean active = true;
 
+    @Column(nullable = false)
+    private boolean emailVerified = true;
+
     @OneToMany(mappedBy = "organizer")
     private List<Event> events;
 

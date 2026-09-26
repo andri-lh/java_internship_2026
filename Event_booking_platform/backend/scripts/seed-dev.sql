@@ -1,19 +1,20 @@
 -- Development seed data for manual testing. DEV ONLY - never run against prod.
 -- Run on an EMPTY database (tables are created by the API on first start):
 --   docker compose exec -T mysql sh -c 'mysql -uroot -p"$MYSQL_ROOT_PASSWORD" event_booking_db' < backend/scripts/seed-dev.sql
--- Every account below uses the password: Password123!
+-- Every account below uses the password: Password123! (all seeded accounts are email-verified)
+-- Requires the Flyway migrations to have run (start the API once first).
 -- Dates are relative to NOW(), so re-seed to refresh them.
 
 SET @pw = '$2a$10$0fSfgyrnLzNYC/3Z/l9aKOATVbTHCat8J4MNghibz27OaNZck0h.i';
 
-INSERT INTO users (username, email, password, role, active) VALUES
-  ('admin',          'admin@example.com',     @pw, 'ADMIN',     1),
-  ('organizer_anna', 'anna@example.com',      @pw, 'ORGANIZER', 1),
-  ('organizer_marco','marco@example.com',     @pw, 'ORGANIZER', 1),
-  ('alice',          'alice@example.com',     @pw, 'ATTENDEE',  1),
-  ('bob',            'bob@example.com',       @pw, 'ATTENDEE',  1),
-  ('carol',          'carol@example.com',     @pw, 'ATTENDEE',  1),
-  ('dave_inactive',  'dave@example.com',      @pw, 'ATTENDEE',  0);
+INSERT INTO users (username, email, password, role, active, email_verified) VALUES
+  ('admin',          'admin@example.com',     @pw, 'ADMIN',     1, 1),
+  ('organizer_anna', 'anna@example.com',      @pw, 'ORGANIZER', 1, 1),
+  ('organizer_marco','marco@example.com',     @pw, 'ORGANIZER', 1, 1),
+  ('alice',          'alice@example.com',     @pw, 'ATTENDEE',  1, 1),
+  ('bob',            'bob@example.com',       @pw, 'ATTENDEE',  1, 1),
+  ('carol',          'carol@example.com',     @pw, 'ATTENDEE',  1, 1),
+  ('dave_inactive',  'dave@example.com',      @pw, 'ATTENDEE',  0, 1);
 
 INSERT INTO venues (name, address, city, capacity) VALUES
   ('Tirana Cultural Centre',  'Rruga Myslym Shyri 1',   'Tirana', 300),
@@ -102,3 +103,6 @@ INSERT INTO reviews (rating, comment, created_at, user_id, event_id) VALUES
   (5, 'Wonderful atmosphere and great musicians.', NOW() - INTERVAL 9 DAY, @alice, @jazz),
   (4, 'Great night, the venue was a little warm.',  NOW() - INTERVAL 9 DAY, @bob,   @jazz),
   (4, 'Useful talks and friendly people.',          NOW() - INTERVAL 29 DAY, @carol, @meetup);
+
+-- Sample images (external placeholders, dev only)
+UPDATE events SET image_url = CONCAT('https://picsum.photos/seed/event', id, '/900/500') WHERE status <> 'CANCELLED';

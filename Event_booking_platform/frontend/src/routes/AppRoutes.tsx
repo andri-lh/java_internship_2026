@@ -9,6 +9,8 @@ import { EventDetailPage } from '../pages/EventDetailPage';
 import { EventsPage } from '../pages/EventsPage';
 import { ForgotPasswordPage } from '../pages/ForgotPasswordPage';
 import { ResetPasswordPage } from '../pages/ResetPasswordPage';
+import { ChangePasswordPage } from '../pages/ChangePasswordPage';
+import { VerifyEmailPage } from '../pages/VerifyEmailPage';
 import { ForbiddenPage } from '../pages/ForbiddenPage';
 import { HomePage } from '../pages/HomePage';
 import { LoginPage } from '../pages/LoginPage';
@@ -33,6 +35,8 @@ export function AppRoutes() {
         <Route path="events/:eventId" element={<EventDetailPage />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
+        <Route path="verify-email" element={<VerifyEmailPage />} />
+        <Route path="account/password" element={<RequireRole roles={['ATTENDEE', 'ORGANIZER', 'ADMIN']}><ChangePasswordPage /></RequireRole>} />
         <Route path="forgot-password" element={<ForgotPasswordPage />} />
         <Route path="reset-password" element={<ResetPasswordPage />} />
 

@@ -291,6 +291,8 @@ public class OrganizerEventServiceImpl implements OrganizerEventService {
         event.setTotalSeats(request.totalSeats());
         event.setVenue(venue);
         event.setCategories(categories);
+        String imageUrl = request.imageUrl() == null ? "" : request.imageUrl().trim();
+        event.setImageUrl(imageUrl.isEmpty() ? null : imageUrl);
     }
 
     private OrganizerEventResponse toResponse(Event event) {
@@ -307,7 +309,8 @@ public class OrganizerEventServiceImpl implements OrganizerEventService {
                 event.getVenue().getId(),
                 event.getCategories().stream()
                         .map(Category::getId)
-                        .collect(Collectors.toSet())
+                        .collect(Collectors.toSet()),
+                event.getImageUrl()
         );
     }
 

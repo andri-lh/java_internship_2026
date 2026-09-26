@@ -17,5 +17,6 @@ public record OrganizerEventResponse(
         Integer availableSeats,
         EventStatus status,
         Long venueId,
-        Set<Long> categoryIds
+        Set<Long> categoryIds,
+        String imageUrl
 ) {}

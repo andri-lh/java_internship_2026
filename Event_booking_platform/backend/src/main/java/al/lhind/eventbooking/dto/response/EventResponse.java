@@ -19,5 +19,6 @@ public record EventResponse(
         String city,
         String organizerUsername,
         Set<String> categories,
-        Double averageRating) {
+        Double averageRating,
+        String imageUrl) {
 }

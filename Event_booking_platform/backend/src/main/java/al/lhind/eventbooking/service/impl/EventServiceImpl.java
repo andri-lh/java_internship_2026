@@ -98,7 +98,8 @@ public class EventServiceImpl implements EventService {
                 event.getOrganizer().getUsername(),
                 event.getCategories().stream()
                         .map(category -> category.getName())
-                        .collect(Collectors.toSet())
+                        .collect(Collectors.toSet()),
+                event.getImageUrl()
         );
     }
 
@@ -143,7 +144,8 @@ public class EventServiceImpl implements EventService {
                 event.getCategories().stream()
                         .map(Category::getName)
                         .collect(Collectors.toSet()),
-                averageRating
+                averageRating,
+                event.getImageUrl()
         );
     }
 

@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 class AdminUserApiIntegrationTest extends MySqlIntegrationTest {
 
-    private static final String USER_PASSWORD = "StrongPass123";
+    private static final String USER_PASSWORD = "StrongPass123!";
 
     @Autowired private MockMvc mockMvc;
     @Autowired private UserRepository userRepository;

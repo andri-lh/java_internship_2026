@@ -35,3 +35,15 @@ export function requestPasswordReset(email: string) {
 export function resetPassword(token: string, newPassword: string) {
   return apiRequest<MessageResponse>('/auth/reset-password', { method: 'POST', body: JSON.stringify({ token, newPassword }) });
 }
+
+export function verifyEmail(token: string) {
+  return apiRequest<MessageResponse>('/auth/verify-email', { method: 'POST', body: JSON.stringify({ token }) });
+}
+
+export function resendVerification(email: string) {
+  return apiRequest<MessageResponse>('/auth/resend-verification', { method: 'POST', body: JSON.stringify({ email }) });
+}
+
+export function changePassword(currentPassword: string, newPassword: string) {
+  return apiRequest<MessageResponse>('/account/password', { method: 'POST', body: JSON.stringify({ currentPassword, newPassword }) });
+}

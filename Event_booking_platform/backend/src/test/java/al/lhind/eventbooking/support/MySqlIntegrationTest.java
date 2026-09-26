@@ -11,8 +11,7 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.MySQLContainer;
 
 @SpringBootTest(properties = {
-        "spring.jpa.hibernate.ddl-auto=create-drop",
-        "jwt.secret=MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIzNDU2Nzg5MDE="
+                "jwt.secret=MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIzNDU2Nzg5MDE="
 })
 @AutoConfigureMockMvc
 @ActiveProfiles("int")
@@ -44,6 +43,7 @@ public abstract class MySqlIntegrationTest {
         jdbcTemplate.update("delete from categories");
         jdbcTemplate.update("delete from venues");
         jdbcTemplate.update("delete from password_reset_tokens");
+        jdbcTemplate.update("delete from email_verification_tokens");
         jdbcTemplate.update("delete from users");
     }
 }

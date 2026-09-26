@@ -7,6 +7,13 @@ interface ApiErrorBody {
   validationErrors?: Record<string, string>;
 }
 
+let unauthorizedHandler: (() => void) | null = null;
+
+// Called when a request that carried a token is rejected with 401 (expired or revoked session).
+export function setUnauthorizedHandler(handler: (() => void) | null): void {
+  unauthorizedHandler = handler;
+}
+
 export class ApiError extends Error {
   readonly status: number;
   readonly validationErrors: Record<string, string>;
@@ -35,6 +42,7 @@ export async function apiRequest<T>(path: string, options: RequestInit = {}): Pr
   const response = await fetch(API_BASE_URL + path, { ...options, headers });
 
   if (!response.ok) {
+    if (response.status === 401 && token && !path.startsWith('/auth/')) unauthorizedHandler?.();
     let message = 'The request could not be completed.';
     let validationErrors: Record<string, string> = {};
     try {

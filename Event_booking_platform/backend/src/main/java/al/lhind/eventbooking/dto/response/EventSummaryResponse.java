@@ -17,6 +17,7 @@ public record EventSummaryResponse(
         String venueName,
         String city,
         String organizerUsername,
-        Set<String> categories
+        Set<String> categories,
+        String imageUrl
 ) {
 }

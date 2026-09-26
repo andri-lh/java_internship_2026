@@ -37,6 +37,9 @@ public class Event {
     @Column(nullable = false, length = 180)
     private String title;
 
+    @Column(length = 500)
+    private String imageUrl;
+
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 

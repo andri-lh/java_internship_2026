@@ -14,6 +14,7 @@ interface FormState {
   totalSeats: string;
   venueId: string;
   categoryIds: number[];
+  imageUrl: string;
 }
 
 const emptyForm: FormState = {
@@ -25,6 +26,7 @@ const emptyForm: FormState = {
   totalSeats: '',
   venueId: '',
   categoryIds: [],
+  imageUrl: '',
 };
 
 const toApiDateTime = (value: string) => (value.length === 16 ? value + ':00' : value);
@@ -63,6 +65,7 @@ export function OrganizerEventFormPage() {
             totalSeats: String(event.totalSeats),
             venueId: String(event.venueId),
             categoryIds: event.categoryIds,
+            imageUrl: event.imageUrl ?? '',
           });
         }
         setState('ready');
@@ -96,6 +99,7 @@ export function OrganizerEventFormPage() {
     if (!Number.isInteger(Number(form.totalSeats)) || Number(form.totalSeats) < 1) found.totalSeats = 'Enter at least 1 seat.';
     else if (venue && Number(form.totalSeats) > venue.capacity) found.totalSeats = 'Seats cannot exceed the venue capacity of ' + venue.capacity + '.';
     if (!form.venueId) found.venueId = 'Choose a venue.';
+    if (form.imageUrl.trim() && !/^https?:\/\/\S+$/.test(form.imageUrl.trim())) found.imageUrl = 'Enter a full http(s) image URL.';
     return found;
   }
 
@@ -115,6 +119,7 @@ export function OrganizerEventFormPage() {
       totalSeats: Number(form.totalSeats),
       venueId: Number(form.venueId),
       categoryIds: form.categoryIds,
+      imageUrl: form.imageUrl.trim() || null,
     };
 
     setSubmitting(true);
@@ -156,6 +161,7 @@ export function OrganizerEventFormPage() {
           <label className="field"><span>Total seats</span><input type="number" min="1" step="1" value={form.totalSeats} onChange={change => update('totalSeats', change.target.value)} aria-invalid={!!errors.totalSeats} />{fieldError('totalSeats')}</label>
         </div>
         <label className="field"><span>Venue</span><select value={form.venueId} onChange={change => update('venueId', change.target.value)} aria-invalid={!!errors.venueId}><option value="">Select a venue</option>{venues.map(venue => <option key={venue.id} value={venue.id}>{venue.name} · {venue.city} (capacity {venue.capacity})</option>)}</select>{fieldError('venueId')}</label>
+        <label className="field"><span>Image URL (optional)</span><input type="url" placeholder="https://…" maxLength={500} value={form.imageUrl} onChange={change => update('imageUrl', change.target.value)} aria-invalid={!!errors.imageUrl} />{fieldError('imageUrl')}</label>
         <fieldset className="category-picker">
           <legend>Categories</legend>
           {categories.length === 0 && <span className="field-hint">No categories are available yet.</span>}

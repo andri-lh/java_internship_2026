@@ -173,6 +173,26 @@ class OrganizerEventApiIntegrationTest extends MySqlIntegrationTest {
     }
 
     @Test
+    void organizerCanSetAndClearAnImageUrlAndInvalidUrlsAreRejected() throws Exception {
+        Fixture fixture = fixture();
+        LocalDateTime start = futureStart();
+        String body = eventJson("Concert", "25.00", start, start.plusHours(2), 4, fixture);
+
+        mockMvc.perform(post("/api/v1/organizer/events")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(fixture.organizer()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body.replace("\"categoryIds\"", "\"imageUrl\": \"https://example.com/a.jpg\", \"categoryIds\"")))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.imageUrl").value("https://example.com/a.jpg"));
+
+        mockMvc.perform(post("/api/v1/organizer/events")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(fixture.organizer()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body.replace("\"categoryIds\"", "\"imageUrl\": \"javascript:alert(1)\", \"categoryIds\"")))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void attendeeAndAnonymousVisitorCannotCreateOrganizerEvents() throws Exception {
         Fixture fixture = fixture();
         User attendee = createUser("attendee", Role.ATTENDEE);

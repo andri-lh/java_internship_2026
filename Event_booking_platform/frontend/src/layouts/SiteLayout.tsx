@@ -38,6 +38,7 @@ export function SiteLayout() {
           <div className="header-actions">
             {session ? (
               <>
+                <NavLink className="header-login" to="/account/password">Password</NavLink>
                 <span className="role-badge">{session.role.toLowerCase()}</span>
                 <button className="button button-quiet header-signout" type="button" onClick={signOut}>Sign out</button>
               </>

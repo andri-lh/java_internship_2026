@@ -58,6 +58,7 @@ export function EventDetailPage() {
 
       <div className="detail-layout">
         <article className="detail-main">
+          {event.imageUrl && <img className="detail-image" src={event.imageUrl} alt="" />}
           <div className="event-tags">{event.categories.map(category => <span className="event-tag" key={category}>{category}</span>)}</div>
           <h1>{event.title}</h1>
           <p className="detail-description">{event.description}</p>

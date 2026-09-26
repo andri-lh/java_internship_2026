@@ -7,7 +7,7 @@ import al.lhind.eventbooking.entity.User;
 import al.lhind.eventbooking.exception.InvalidRequestException;
 import al.lhind.eventbooking.repository.PasswordResetTokenRepository;
 import al.lhind.eventbooking.repository.UserRepository;
-import al.lhind.eventbooking.service.PasswordResetMailSender;
+import al.lhind.eventbooking.service.AccountMailSender;
 import al.lhind.eventbooking.service.PasswordResetService;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -35,7 +35,7 @@ public class PasswordResetServiceImpl implements PasswordResetService {
     private final UserRepository userRepository;
     private final PasswordResetTokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
-    private final PasswordResetMailSender mailSender;
+    private final AccountMailSender mailSender;
     private final String frontendBaseUrl;
     private final int validMinutes;
     private final SecureRandom secureRandom = new SecureRandom();
@@ -44,7 +44,7 @@ public class PasswordResetServiceImpl implements PasswordResetService {
             UserRepository userRepository,
             PasswordResetTokenRepository tokenRepository,
             PasswordEncoder passwordEncoder,
-            PasswordResetMailSender mailSender,
+            AccountMailSender mailSender,
             @Value("${app.frontend-base-url:http://localhost:5173}") String frontendBaseUrl,
             @Value("${app.password-reset.expiration-minutes:30}") int validMinutes) {
         this.userRepository = userRepository;

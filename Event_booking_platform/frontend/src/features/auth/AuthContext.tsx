@@ -1,4 +1,5 @@
-import { createContext, useContext, useMemo, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { setUnauthorizedHandler } from '../../services/apiClient';
 import {
   readSession,
   removeSession,
@@ -28,6 +29,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(null);
     },
   }), [session]);
+
+  useEffect(() => {
+    setUnauthorizedHandler(value.signOut);
+    return () => setUnauthorizedHandler(null);
+  }, [value]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

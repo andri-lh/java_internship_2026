@@ -17,7 +17,7 @@ import al.lhind.eventbooking.entity.Role;
 import al.lhind.eventbooking.entity.User;
 import al.lhind.eventbooking.repository.PasswordResetTokenRepository;
 import al.lhind.eventbooking.repository.UserRepository;
-import al.lhind.eventbooking.service.PasswordResetMailSender;
+import al.lhind.eventbooking.service.AccountMailSender;
 import al.lhind.eventbooking.support.MySqlIntegrationTest;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
@@ -38,7 +38,7 @@ class PasswordResetApiIntegrationTest extends MySqlIntegrationTest {
     @Autowired private PasswordResetTokenRepository tokenRepository;
     @Autowired private PasswordEncoder passwordEncoder;
 
-    @MockitoBean private PasswordResetMailSender mailSender;
+    @MockitoBean private AccountMailSender mailSender;
 
     @Test
     void knownAndUnknownEmailsGetTheSameResponseButOnlyKnownOnesReceiveMail() throws Exception {

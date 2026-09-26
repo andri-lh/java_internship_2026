@@ -99,7 +99,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/organizer/**")
                         .hasRole("ORGANIZER")
 
-                        .requestMatchers("/api/v1/bookings/**")
+                        .requestMatchers("/api/v1/bookings/**", "/api/v1/waitlist/**")
                         .hasRole("ATTENDEE")
 
                         .requestMatchers(

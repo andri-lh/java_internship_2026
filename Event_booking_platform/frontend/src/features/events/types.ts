@@ -17,6 +17,7 @@ export interface EventSummary {
   city: string;
   organizerUsername: string;
   categories: string[];
+  imageUrl?: string | null;
 }
 
 export interface EventDetail extends EventSummary {

@@ -14,6 +14,7 @@ export interface OrganizerEvent {
   status: EventStatus;
   venueId: number;
   categoryIds: number[];
+  imageUrl?: string | null;
 }
 
 export interface EventPayload {
@@ -25,6 +26,7 @@ export interface EventPayload {
   totalSeats: number;
   venueId: number;
   categoryIds: number[];
+  imageUrl: string | null;
 }
 
 export interface Venue {

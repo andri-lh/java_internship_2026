@@ -11,7 +11,7 @@ export function EventCard({ event, index = 0 }: { event: EventSummary; index?: n
 
   return (
     <article className="event-card">
-      <div className="event-card-art" data-tone={index % 3}>
+      <div className="event-card-art" data-tone={index % 3} style={event.imageUrl ? { backgroundImage: 'linear-gradient(180deg, rgba(0,0,0,.05), rgba(0,0,0,.25)), url("' + event.imageUrl + '")' } : undefined}>
         <span className="art-ring art-ring-one" aria-hidden="true" />
         <span className="art-ring art-ring-two" aria-hidden="true" />
         <span className="event-city">{event.city}</span>

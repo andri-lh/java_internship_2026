@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
@@ -35,5 +36,8 @@ public record EventCreateRequest(
         Long venueId,
 
         @NotNull
-        Set<@NotNull @Positive Long> categoryIds
+        Set<@NotNull @Positive Long> categoryIds,
+
+        @Size(max = 500) @Pattern(regexp = "^(https?://\\S+)?$", message = "must be an http(s) URL")
+        String imageUrl
 ) {}

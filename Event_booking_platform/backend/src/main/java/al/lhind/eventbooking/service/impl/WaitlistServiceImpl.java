@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class WaitlistServiceImpl implements WaitlistService {
@@ -97,6 +98,53 @@ public class WaitlistServiceImpl implements WaitlistService {
                 event.getTitle(),
                 savedEntry.getStatus().name(),
                 savedEntry.getJoinedAt()
+        );
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<WaitlistResponse> getMyEntries(String username) {
+        User user = requireAttendee(username);
+        return waitlistEntryRepository.findByUserIdOrderByJoinedAtDesc(user.getId()).stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    @Override
+    @Transactional
+    public WaitlistResponse leaveWaitlist(String username, Long entryId) {
+        User user = requireAttendee(username);
+        WaitlistEntry entry = waitlistEntryRepository.findById(entryId)
+                .filter(found -> found.getUser().getId().equals(user.getId()))
+                .orElseThrow(() -> new ResourceNotFoundException("Waitlist entry not found"));
+
+        if (entry.getStatus() != WaitlistStatus.WAITING) {
+            throw new BusinessConflictException("Only entries that are still waiting can be left");
+        }
+
+        entry.setStatus(WaitlistStatus.CANCELLED);
+        WaitlistEntry saved = waitlistEntryRepository.save(entry);
+        log.info("Waitlist left: entryId={}, userId={}", saved.getId(), user.getId());
+        return toResponse(saved);
+    }
+
+    private User requireAttendee(String username) {
+        User user = userRepository.findByUsername(username)
+                .filter(User::isActive)
+                .orElseThrow(() -> new AuthenticationFailureException("Active user not found"));
+        if (user.getRole() != Role.ATTENDEE) {
+            throw new ForbiddenOperationException("Only attendees have a waitlist");
+        }
+        return user;
+    }
+
+    private WaitlistResponse toResponse(WaitlistEntry entry) {
+        return new WaitlistResponse(
+                entry.getId(),
+                entry.getEvent().getId(),
+                entry.getEvent().getTitle(),
+                entry.getStatus().name(),
+                entry.getJoinedAt()
         );
     }
 }
