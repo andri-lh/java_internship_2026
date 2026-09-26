@@ -10,8 +10,13 @@ browse and reserve seats, and **admins** manage the catalog, the users, and ever
 This README explains the project from the basics: what it does, how it is built, how to run it, how to test it, what
 data is in the demo deployments, how to try every feature, and how it was deployed on AWS EC2.
 
-> The two live deployments are temporary demos for the internship review:
-> Railway `https://web-event-management.up.railway.app` and AWS EC2 `https://16-192-82-197.sslip.io`.
+> **Live demo status**
+> - **Railway (running):** `https://web-event-management.up.railway.app`. This is the live demo to use for review.
+> - **AWS EC2 (currently stopped to save cost):** `https://16-192-82-197.sslip.io`. The instance was deployed and tested,
+>   then switched off. Screenshots of it running are in [section 18](#18-deployment-on-aws-ec2), and it can be started
+>   again on request (see section 18.6).
+>
+> Both deployments are temporary demos for the internship review.
 
 ## Table of contents
 
@@ -428,7 +433,7 @@ credentials for a non-production showcase, so they are listed here on purpose.
 | Deployment | Admin (`admin`) | All demo accounts (`demo_*`) |
 |---|---|---|
 | Railway `https://web-event-management.up.railway.app` | `MyDemo%Admin2026` | `Demo%Showcase2026` |
-| AWS EC2 `https://16-192-82-197.sslip.io` | `Aa1!Ed2ifi0hXiaME9Il` | `Aa1!srQ3mqpsJtFgfYFQ` |
+| AWS EC2 `https://16-192-82-197.sslip.io` *(currently stopped)* | `Aa1!Ed2ifi0hXiaME9Il` | `Aa1!srQ3mqpsJtFgfYFQ` |
 | Local Docker (after loading `backend/scripts/seed-dev.sql`) | `Password123!` | `Password123!` (users `alice`, `bob`, `carol`, `organizer_anna`, `organizer_marco`) |
 
 | Username | Role |
@@ -516,7 +521,13 @@ token, and try any endpoint for your role.
 
 ## 17. Deployment on Railway
 
-Railway builds each service from the GitHub repository.
+Railway builds each service from the GitHub repository. The project has three services: the MySQL database, the `api`
+(Spring Boot) and the `web` frontend (nginx), all running.
+
+![Railway project: api, web and MySQL services online](deploy/images/railway.png)
+
+*The Railway project with the `api`, `web` and `MySQL` services online. The `web` service has the public domain, and it
+talks to `api` over Railway's private network, which in turn talks to MySQL.*
 
 1. Create a project, add the **MySQL** service, and add two GitHub services from this repository.
 2. **`api`** — root directory `/Event_booking_platform/backend` (uses `backend/Dockerfile`), health check path
@@ -545,6 +556,10 @@ Railway builds each service from the GitHub repository.
 Flyway builds the schema on first start; the admin and demo data are created on the same start.
 
 ## 18. Deployment on AWS EC2
+
+> **Status: the EC2 instance is currently stopped** (Instance state: *Stopped*) to avoid unnecessary cost, so the address
+> `https://16-192-82-197.sslip.io` does not respond right now. The screenshots below were taken while it was running. The
+> disk, the configuration and the data are preserved, so it can be started again (section 18.6).
 
 The same application also runs on one AWS EC2 server using Docker Compose. Only ports 80 and 443 are exposed to the
 internet: **Caddy** (HTTPS) → **nginx** (React + `/api` proxy) → **Spring Boot API** → **MySQL**, all as containers
@@ -663,6 +678,16 @@ All containers restart automatically after a reboot.
 2. Release the Elastic IP (an unattached Elastic IP is billed).
 3. Delete the key pair, leftover volumes or snapshots, and revoke the GitHub token.
 
+### 18.6 Stopping and starting the instance
+
+- **Stop** (what was done for now): EC2 → Instances → select the instance → *Instance state → Stop instance*. Compute
+  charges stop and the site goes offline, while the disk (with the code, `.env.prod` and the MySQL data) and the Elastic IP are kept.
+  A small charge for the disk and the public IP address continues while it is stopped.
+- **Start again:** *Instance state → Start instance*, wait about a minute. The Elastic IP is still attached, so the address does
+  not change, and the containers restart on their own. Then open `https://16-192-82-197.sslip.io`; if anything looks wrong,
+  connect with SSH and run `docker compose -f compose.prod.yaml --env-file .env.prod ps`.
+- **Terminate** (permanent, see 18.5) deletes the server and its database and is only for the end of the review.
+
 ## 19. Continuous integration
 
 **File:** `.github/workflows/event-booking-ci.yml`, located at the root of the git repository. GitHub Actions only picks up
@@ -732,7 +757,7 @@ checks to pass first), and the AWS EC2 server is updated by hand with `git pull`
 This project started as a backend assignment and grew into a complete, deployed application: a Spring Boot API with a
 carefully designed data model, JWT security by role, transactional seat handling that stays correct under concurrent
 bookings, a React interface for every role, automated tests against a real MySQL database, migrations with Flyway,
-CI, and two running deployments (Railway and AWS EC2).
+CI, and two deployments (Railway, running, and AWS EC2, currently stopped to save cost).
 
 Along the way, real problems were found and fixed by testing the deployed system, not just the code: a proxy that broke
 cross-origin login, a redirect that sent organizers to the wrong page, documentation that was unreachable behind the
