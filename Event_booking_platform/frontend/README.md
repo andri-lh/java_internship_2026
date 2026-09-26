@@ -1,6 +1,6 @@
 # Event Booking Frontend
 
-React, TypeScript, and Vite frontend for EventBooking. The home page and public event browser are implemented. Authentication, event details, and role-specific workspaces are upcoming steps.
+React, TypeScript, and Vite frontend for EventBooking: public event browsing, authentication, and attendee, organizer, and admin workspaces.
 
 ## Requirements
 
@@ -23,4 +23,4 @@ Vite prints the local development URL, normally http://localhost:5173. Start the
 - npm run build: type-check and create a production build in dist/.
 - npm run preview: serve the production build locally.
 
-The API base path defaults to /api/v1. Copy .env.example to .env.local to override VITE_API_BASE_URL when needed. A separately hosted production frontend also needs an API routing or CORS configuration.
+The API base path defaults to /api/v1. Copy .env.example to .env.local to override VITE_API_BASE_URL when needed. For a separately hosted production frontend, set VITE_API_BASE_URL to the API's full URL at build time and add the site's origin to the backend's CORS_ALLOWED_ORIGINS, or have the host rewrite /api/* to the backend. public/_redirects and vercel.json provide the single-page-app fallback.

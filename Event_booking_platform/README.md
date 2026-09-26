@@ -26,7 +26,9 @@ docker compose up --build
 
 3. Stop with `docker compose down`. Add `-v` only when you intentionally want to delete the local database volume.
 
-The API listens on port 8080.
+The API listens on port 8080. Mailpit's inbox (password reset emails) is at `http://localhost:8025`. Health check: `http://localhost:8080/actuator/health`.
+
+Optional dev data: see `backend/scripts/seed-dev.sql` (dev only; documents the test accounts).
 
 ## API documentation
 
@@ -40,6 +42,20 @@ Public endpoints can be tried directly. For protected endpoints, register or log
 - `dev`: local development database settings; activated by Compose.
 - `int`: integration-test settings. Testcontainers supplies the MySQL connection values during the test suite.
 - `prod`: production settings; provide secrets and database connection values through the deployment environment.
+
+### Environment variables
+
+| Variable | dev (Compose) | prod | Purpose |
+|---|---|---|---|
+| `SPRING_PROFILES_ACTIVE` | `dev` (set by Compose) | `prod` | Selects the profile |
+| `SPRING_DATASOURCE_URL` / `_USERNAME` / `_PASSWORD` | set by Compose | **required** | MySQL connection |
+| `JWT_SECRET` | placeholder in `.env.example` | **required** | Base64 secret, at least 32 bytes (`openssl rand -base64 48`) |
+| `JWT_EXPIRATION` | `3600000` | optional | Token lifetime in ms |
+| `CORS_ALLOWED_ORIGINS` | `http://localhost:5173` | **required** if the frontend is on another origin | Comma-separated browser origins |
+| `APP_FRONTEND_BASE_URL` | `http://localhost:5173` | **required** | Base URL used in password reset links |
+| `MAIL_HOST` / `MAIL_PORT` | Mailpit (set by Compose) | **required** | SMTP server |
+| `MAIL_USERNAME` / `MAIL_PASSWORD` / `MAIL_FROM` | not needed | as your provider requires | SMTP credentials and sender address |
+| `PASSWORD_RESET_EXPIRATION_MINUTES` | `30` | optional | Reset link lifetime |
 
 Never commit `.env` or real credentials. In the `dev` profile, Hibernate `ddl-auto=update` creates and updates the local schema from the entity mappings. Avoid using `update` against production data; use a controlled schema process before production deployment.
 
@@ -62,3 +78,8 @@ The integration tests share one temporary MySQL container per Maven run. They cl
 ## Frontend development
 
 In a second terminal, run `npm install` and `npm run dev` from `frontend/`. The Vite development server proxies `/api` requests to the backend on port 8080. See `frontend/README.md` for details.
+
+## Deploying
+
+- **Backend:** build the image from `backend/Dockerfile`, set the prod variables above, and point the platform's health check at `/actuator/health`.
+- **Frontend:** build with `npm run build` and host `frontend/dist/` on any static host. Set `VITE_API_BASE_URL` at build time to the API's full URL (and add the site to the backend's `CORS_ALLOWED_ORIGINS`), or have the host rewrite `/api/*` to the backend. `public/_redirects` (Netlify/Cloudflare Pages) and `vercel.json` make deep links like `/events/3` work.
