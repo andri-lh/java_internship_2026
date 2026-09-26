@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { Link, Navigate, useLocation, useNavigate } from 'react-router';
+import { Link, Navigate, useLocation } from 'react-router';
 import { useAuth } from '../features/auth/AuthContext';
 import { login, resendVerification } from '../features/auth/authApi';
 import { roleHome } from '../features/auth/roleHome';
@@ -14,9 +14,8 @@ interface LocationState {
 
 export function LoginPage() {
   const { session, signIn } = useAuth();
-  const navigate = useNavigate();
   const state = (useLocation().state ?? {}) as LocationState;
-  const destination = state.from ? state.from.pathname + (state.from.search ?? '') : '/events';
+  const returnTo = state.from ? state.from.pathname + (state.from.search ?? '') : null;
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -27,7 +26,7 @@ export function LoginPage() {
   const [resendEmail, setResendEmail] = useState('');
   const [resendNotice, setResendNotice] = useState('');
 
-  if (session) return <Navigate to={destination} replace />;
+  if (session) return <Navigate to={returnTo ?? (session.role === 'ATTENDEE' ? '/events' : roleHome(session.role).path)} replace />;
 
   async function resend() {
     try {
@@ -47,7 +46,6 @@ export function LoginPage() {
     try {
       const response = await login({ username: username.trim(), password });
       signIn({ accessToken: response.accessToken, role: response.role }, remember);
-      navigate(state.from || response.role === 'ATTENDEE' ? destination : roleHome(response.role).path, { replace: true });
     } catch (failure) {
       setUnverified(failure instanceof ApiError && failure.status === 403);
       setError(failure instanceof ApiError && failure.status < 500
