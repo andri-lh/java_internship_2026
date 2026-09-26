@@ -12,5 +12,7 @@ FROM nginx:1.27-alpine
 # The official image renders /etc/nginx/templates/*.template with the container's environment on start.
 COPY nginx/default.conf.template /etc/nginx/templates/default.conf.template
 ENV API_UPSTREAM=http://api:8080
+# Make the nginx image export the container's own DNS servers (Docker's, Railway's, ...) as NGINX_LOCAL_RESOLVERS.
+ENV NGINX_ENTRYPOINT_LOCAL_RESOLVERS=1
 COPY --from=build /app/dist /usr/share/nginx/html
 EXPOSE 80
